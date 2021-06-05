@@ -36,7 +36,7 @@ public class MealsUtil {
         List<MealTo> mealsTo = new ArrayList<>();
         meals.forEach(meal -> {
             if (TimeUtil.isBetweenHalfOpen(meal.getTime(), startTime, endTime)) {
-                mealsTo.add(creatTo(meal, caloriesSumByDate.get(meal.getDate()) > caloriesPerDay));
+                mealsTo.add(createTo(meal, caloriesSumByDate.get(meal.getDate()) > caloriesPerDay));
             }
         });
         return mealsTo;
@@ -44,18 +44,15 @@ public class MealsUtil {
 
     public static List<MealTo> filteredByStreams(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         // TODO Implement by streams
-        Map<LocalDate, Integer> mapCaloriesPerDay = meals.stream()
+        Map<LocalDate, Integer> caloriesSumByDate = meals.stream()
                 .collect(Collectors.groupingBy(um -> um.getDateTime().toLocalDate(), Collectors.summingInt(Meal::getCalories)));
         return meals.stream()
-                .filter(m -> TimeUtil.isBetweenHalfOpen(m.getDateTime().toLocalTime(), startTime, endTime))
-                .map(m -> new MealTo(m.getDateTime(),
-                        m.getDescription(),
-                        m.getCalories(),
-                        mapCaloriesPerDay.getOrDefault(m.getDateTime().toLocalDate(), 0) > caloriesPerDay))
+                .filter(meal -> TimeUtil.isBetweenHalfOpen(meal.getTime(), startTime, endTime))
+                .map(meal -> createTo(meal, caloriesSumByDate.getOrDefault(meal.getDate(), 0) > caloriesPerDay))
                 .collect(Collectors.toList());
     }
 
-    private static MealTo creatTo(Meal meal, boolean excess) {
+    private static MealTo createTo(Meal meal, boolean excess) {
         return new MealTo(meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
     }
 }
