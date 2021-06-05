@@ -10,7 +10,7 @@ import java.time.Month;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class UserMealsUtil {
+public class MealsUtil {
     public static void main(String[] args) {
         List<Meal> meals = Arrays.asList(
                 new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500),
@@ -31,13 +31,14 @@ public class UserMealsUtil {
     public static List<MealTo> filteredByCycles(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         // TODO return filtered list with excess. Implement by cycles
         Map<LocalDate, Integer> sumCaloriesPerDays = new HashMap<>();
-        List<MealTo> mealsTo = new ArrayList<>();
-        meals.forEach(um -> sumCaloriesPerDays.merge(um.getDateTime().toLocalDate(), um.getCalories(), Integer::sum));
+        meals.forEach(meal -> sumCaloriesPerDays.merge(meal.getDateTime().toLocalDate(), meal.getCalories(), Integer::sum));
 
-        meals.forEach(um->
-            if (TimeUtil.isBetweenHalfOpen(um.getDateTime().toLocalTime(), startTime, endTime)) {
-                mealsTo.add(new MealTo(um.getDateTime(), um.getDescription(), um.getCalories(), sumCaloriesPerDays.getOrDefault(lt.toLocalDate(), 0) > caloriesPerDay));
-            });
+        List<MealTo> mealsTo = new ArrayList<>();
+        meals.forEach(meal -> {
+            if (TimeUtil.isBetweenHalfOpen(meal.getTime(), startTime, endTime)) {
+                mealsTo.add(creatTo(meal, sumCaloriesPerDays.get(meal.getDate()) > caloriesPerDay));
+            }
+        });
         return mealsTo;
     }
 
