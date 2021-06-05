@@ -30,13 +30,13 @@ public class MealsUtil {
 
     public static List<MealTo> filteredByCycles(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         // TODO return filtered list with excess. Implement by cycles
-        Map<LocalDate, Integer> sumCaloriesPerDays = new HashMap<>();
-        meals.forEach(meal -> sumCaloriesPerDays.merge(meal.getDateTime().toLocalDate(), meal.getCalories(), Integer::sum));
+        Map<LocalDate, Integer> caloriesSumByDate = new HashMap<>();
+        meals.forEach(meal -> caloriesSumByDate.merge(meal.getDateTime().toLocalDate(), meal.getCalories(), Integer::sum));
 
         List<MealTo> mealsTo = new ArrayList<>();
         meals.forEach(meal -> {
             if (TimeUtil.isBetweenHalfOpen(meal.getTime(), startTime, endTime)) {
-                mealsTo.add(creatTo(meal, sumCaloriesPerDays.get(meal.getDate()) > caloriesPerDay));
+                mealsTo.add(creatTo(meal, caloriesSumByDate.get(meal.getDate()) > caloriesPerDay));
             }
         });
         return mealsTo;
